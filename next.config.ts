@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "https://yen-portfolio-git-master-inn162s-projects.vercel.app",
+  "https://yen-portfolio-flax.vercel.app",
 ];
 
 const nextConfig: NextConfig = {
