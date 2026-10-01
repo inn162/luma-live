@@ -1,21 +1,26 @@
 export function fmtUSD(n: number, compact = false): string {
   const abs = Math.abs(n);
   const sign = n < 0 ? "-" : "";
-  if (abs >= 1_000_000) {
-    const v = (abs / 1_000_000).toFixed(1);
-    return `${sign}$${v}M`;
+  if (compact) {
+    if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(1)}M`;
+    if (abs >= 1_000) return `${sign}$${Math.round(abs / 1000)}K`;
+    return `${sign}$${Math.round(abs).toLocaleString()}`;
   }
-  if (abs >= 1_000) {
-    const v = Math.round(abs / 1000);
-    return `${sign}$${v}K`;
-  }
+  if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(2)}M`;
+  if (abs >= 1_000) return `${sign}$${(abs / 1_000).toFixed(0)}K`;
   return `${sign}$${Math.round(abs).toLocaleString()}`;
 }
 
+export function fmtK(n: number): string {
+  const abs = Math.abs(n);
+  const sign = n < 0 ? "-" : "";
+  return `${sign}$${Math.round(abs / 1000)}K`;
+}
+
 export function fmtPct(n: number, showSign = false): string {
-  const abs = (Math.abs(n) * 100).toFixed(1) + "%";
-  if (!showSign) return abs;
-  return (n >= 0 ? "+" : "-") + abs;
+  const s = (Math.abs(n) * 100).toFixed(1) + "%";
+  if (!showSign) return s;
+  return (n >= 0 ? "+" : "-") + s;
 }
 
 export function variancePct(actual: number, budget: number): number {
@@ -23,16 +28,34 @@ export function variancePct(actual: number, budget: number): number {
   return (actual - budget) / Math.abs(budget);
 }
 
-export function getEventColor(code: string): string {
-  const map: Record<string, string> = {
-    EC26: "#3B82F6", AG26: "#F59E0B", TL26: "#14B8A6", NV26: "#8B5CF6", ANE26: "#93C5FD",
-  };
-  return map[code] ?? "#9A9A9A";
+export function clamp(n: number, min: number, max: number): number {
+  return Math.min(Math.max(n, min), max);
 }
 
-export function getEventName(code: string): string {
-  const map: Record<string, string> = {
-    EC26: "Echo", AG26: "Afterglow", TL26: "Tideline", NV26: "Nova", ANE26: "Aurora NYE",
-  };
-  return map[code] ?? code;
+export function sumBy<T>(arr: T[], fn: (x: T) => number): number {
+  return arr.reduce((s, x) => s + fn(x), 0);
+}
+
+export const EVENT_COLORS: Record<string, string> = {
+  COV26: "#7C3AED",
+  SOL26: "#D97706",
+  HBR26: "#0891B2",
+  MRD26: "#059669",
+  VRT26: "#DB2777",
+};
+
+export const EVENT_NAMES: Record<string, string> = {
+  COV26: "Cove",
+  SOL26: "Solaris",
+  HBR26: "Harbor",
+  MRD26: "Meridian",
+  VRT26: "Vertigo NYE",
+};
+
+export function eventColor(code: string): string {
+  return EVENT_COLORS[code] ?? "#6B7280";
+}
+
+export function eventName(code: string): string {
+  return EVENT_NAMES[code] ?? code;
 }

@@ -1,38 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --luma-black: #0A0A0A;
-  --luma-white: #FAFAFA;
-  --luma-gold: #C9A84C;
-  --luma-gray-50: #F7F7F7;
-  --luma-gray-100: #EFEFEF;
-  --luma-gray-200: #DEDEDE;
-  --luma-gray-400: #9A9A9A;
-  --luma-gray-600: #5A5A5A;
-  --luma-gray-800: #1F1F1F;
-
-  --afterglow: #F59E0B;
-  --echo: #3B82F6;
-  --tideline: #14B8A6;
-  --nova: #8B5CF6;
-  --aurora: #93C5FD;
-
+  /* Surfaces */
   --bg: #FFFFFF;
-  --surface: #F9F9F9;
-  --border: #E8E8E8;
+  --surface: #F7F7F9;
+  --surface-2: #F0F0F4;
+  --border: #E8E8ED;
+  --border-2: #D1D1D8;
+
+  /* Text */
   --text-primary: #111111;
-  --text-secondary: #666666;
-  --text-muted: #999999;
+  --text-secondary: #6B6B73;
+  --text-muted: #6B6B73;
+  --text-xmuted: #9B9BA3;
+
+  /* Primary accent — electric pink */
+  --accent: #FF3EA5;
+  --accent-light: #FFD6EB;
+  --accent-hover: #E0368F;
+
+  /* Secondary accent — vivid violet */
+  --accent-2: #7657FF;
+  --accent-2-light: #E6E0FF;
+
+  /* Deep plum (used for hero dark sections) */
+  --plum: #4A214F;
+
+  /* Semantic */
   --positive: #16A34A;
+  --positive-bg: #F0FDF4;
   --negative: #DC2626;
-  --navy: #1E3A5F;
+  --negative-bg: #FEF2F2;
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+
+  /* Event colors — semantic identifiers, not UI accents */
+  --cov26: #7C3AED;
+  --sol26: #D97706;
+  --hbr26: #0891B2;
+  --mrd26: #059669;
+  --vrt26: #DB2777;
+
+  /* Chart */
+  --chart-inflow: #FF3EA5;
+  --chart-outflow: #6B6B73;
+  --chart-balance: #111111;
+  --chart-forecast-bg: rgba(255, 214, 235, 0.35);
+  --chart-trough: #D97706;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html { scroll-behavior: smooth; }
+
 body {
   font-family: var(--font-inter, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
   background: var(--bg);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
 }
+
+.mono {
+  font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', monospace);
+  font-feature-settings: "tnum";
+}
+
+/* Scroll snap for section nav */
+.section-anchor { scroll-margin-top: 56px; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
