@@ -20,7 +20,7 @@ export function applyScenario(txns: ForecastTxn[], scenario: Scenario): Forecast
     const isNegotiable = tx.negotiability === "negotiable";
 
     const delayDays: Record<Scenario, number> = {
-      base: 0, receipts_1w: 7, receipts_2w: 14, receipts_3w: 21,
+      base: 0, receipts_1w: 7, receipts_2w: 14,
       defer_costs: 0, combined_2w: 14,
     };
 
@@ -235,7 +235,6 @@ export const ALL_SCENARIO_STATS: Record<Scenario, FundingStats> = {
   base: fundingStats("base"),
   receipts_1w: fundingStats("receipts_1w"),
   receipts_2w: fundingStats("receipts_2w"),
-  receipts_3w: fundingStats("receipts_3w"),
   defer_costs: fundingStats("defer_costs"),
   combined_2w: fundingStats("combined_2w"),
 };

@@ -93,7 +93,6 @@ export type Scenario =
   | "base"
   | "receipts_1w"
   | "receipts_2w"
-  | "receipts_3w"
   | "defer_costs"
   | "combined_2w";
 

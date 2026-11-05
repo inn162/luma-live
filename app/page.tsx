@@ -5,7 +5,7 @@ import type { Scenario } from "./model/types";
 import { ALL_SCENARIO_STATS, SPENDABLE_CASH } from "./model/cashEngine";
 import { fmtUSD } from "./lib/utils";
 import { KPICard } from "./components/KPICard";
-import { CashFlowChart } from "./components/CashFlowChart";
+import { CashOverviewChart } from "./components/CashOverviewChart";
 import { FundingBridge } from "./components/FundingBridge";
 import { ScenarioLab } from "./components/ScenarioLab";
 import { CashDriverTree } from "./components/CashDriverTree";
@@ -46,55 +46,6 @@ export default function Home() {
 
   return (
     <div style={{ background: "#fff", minHeight: "100vh" }}>
-      {/* ── Hero ─────────────────────────────────────────────────────────────── */}
-      <div style={{ background: "#4A214F", color: "#fff", padding: "72px 0 80px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 32px" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase" as const, color: "#FF3EA5", marginBottom: 20, fontFamily: "var(--font-mono, monospace)" }}>
-            LUMA LIVE — Management Information System
-          </div>
-
-          <h1 style={{ fontSize: "clamp(28px, 5vw, 52px)", fontWeight: 900, lineHeight: 1.1, marginBottom: 20, letterSpacing: "-0.02em" }}>
-            Will we need more cash?<br />
-            <span style={{ color: "#FF3EA5" }}>How much. When. Why.</span>
-          </h1>
-
-          <p style={{ fontSize: 16, color: "#94A3B8", maxWidth: 640, lineHeight: 1.7, marginBottom: 32 }}>
-            A transaction-level cash forecasting system for a live event business.
-            Five events, three cost ledgers, six scenario paths, one coherent picture of liquidity risk
-            — built from first principles, not a spreadsheet.
-          </p>
-
-          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-            {[
-              { label: "Events in 2026", value: "5" },
-              { label: "Forecast transactions", value: "27" },
-              { label: "GL rows classified", value: "89" },
-              { label: "Scenarios modeled", value: "6" },
-            ].map((s) => (
-              <div key={s.label} style={{ textAlign: "center" as const }}>
-                <div style={{ fontSize: 28, fontWeight: 800, fontFamily: "var(--font-mono, monospace)", color: "#fff", lineHeight: 1 }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: "#B8A0C0", marginTop: 3, letterSpacing: "0.04em" }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 36, display: "flex", gap: 12, flexWrap: "wrap" }}>
-            {[
-              "#transaction-level-forecast",
-              "#three-cost-ledgers",
-              "#scenario-analysis",
-              "#accrual-vs-cash",
-              "#funding-gap-engine",
-              "#deterministic-classification",
-            ].map((tag) => (
-              <span key={tag} style={{ fontSize: 11, color: "#C8A8D8", background: "#3B1040", padding: "4px 10px", borderRadius: 3, fontFamily: "var(--font-mono, monospace)" }}>
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* ── Sticky Nav ───────────────────────────────────────────────────────── */}
       <nav style={{
         position: "sticky" as const,
@@ -183,7 +134,7 @@ export default function Home() {
           </div>
 
           <Card>
-            <CashFlowChart scenario={scenario} />
+            <CashOverviewChart scenario={scenario} />
           </Card>
 
           <Annotation>
@@ -215,7 +166,7 @@ export default function Home() {
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: 12 }}>
-              Scenario Lab — 6 Paths Modeled
+              Scenario Lab — 5 Paths Modeled
             </div>
             <Card>
               <ScenarioLab selected={scenario} onChange={setScenario} />
@@ -341,7 +292,6 @@ const SCENARIO_LABELS: Record<Scenario, string> = {
   base: "Base Case",
   receipts_1w: "Receipts −1 Week",
   receipts_2w: "Receipts −2 Weeks",
-  receipts_3w: "Receipts −3 Weeks",
   defer_costs: "Defer Negotiable Costs",
   combined_2w: "Combined −2 Weeks",
 };
@@ -351,12 +301,11 @@ function scenarioLabel(s: Scenario) {
 }
 
 function ScenarioStrip({ scenario, onSelect }: { scenario: Scenario; onSelect: (s: Scenario) => void }) {
-  const scenarios: Scenario[] = ["base", "receipts_1w", "receipts_2w", "receipts_3w", "defer_costs", "combined_2w"];
+  const scenarios: Scenario[] = ["base", "receipts_1w", "receipts_2w", "defer_costs", "combined_2w"];
   const TAGS: Record<Scenario, { label: string; color: string }> = {
     base: { label: "Base", color: "#FF3EA5" },
     receipts_1w: { label: "Stress", color: "#D97706" },
     receipts_2w: { label: "Stress", color: "#D97706" },
-    receipts_3w: { label: "Severe", color: "#DC2626" },
     defer_costs: { label: "Mitigate", color: "#16A34A" },
     combined_2w: { label: "Combined", color: "#7657FF" },
   };

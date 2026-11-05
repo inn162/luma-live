@@ -62,60 +62,71 @@ export function FundingBridge({ scenario }: Props) {
     },
   ];
 
-  const BAR_H = 30;
-  const LABEL_W = 220;
-  const META_W = 90;
-  const TRACK_W = 340;
+  // Scale: zero at natural position based on max positive / max negative
+  const MAX_POS = SPENDABLE_CASH;
+  const MAX_NEG = Math.max(Math.abs(stats.troughBalance), 200_000);
+  const TOTAL_RANGE = MAX_POS + MAX_NEG;
+
+  const LABEL_W = 200;
+  const DELTA_W = 76;
+  const BAL_W = 72;
+  const TRACK_W = 280;
+  const TRACK_START = LABEL_W + DELTA_W + BAL_W;
+  const BAR_H = 26;
   const GAP = 10;
-  const totalH = steps.length * (BAR_H + GAP) + 60;
-  const maxVal = Math.max(SPENDABLE_CASH, Math.abs(stats.troughBalance) + 400_000);
-  const scale = TRACK_W / maxVal;
-  const zeroX = LABEL_W + META_W;
+  const SVG_W = TRACK_START + TRACK_W + 12;
+
+  // x coordinate for a balance value (within the track)
+  const xOf = (bal: number) =>
+    TRACK_START + ((bal + MAX_NEG) / TOTAL_RANGE) * TRACK_W;
+  const zeroX = xOf(0);
+
+  // All rows including trough annotation
+  const allRows = [
+    ...steps,
+    ...(stats.peakGap > 0
+      ? [{ label: "Trough", sub: stats.troughLabel ?? "Dec 15", value: 0, runningBalance: stats.troughBalance, type: "trough" as const }]
+      : []),
+  ];
+  const totalH = allRows.length * (BAR_H + GAP) + 20;
 
   return (
     <div>
       {/* SVG bridge */}
       <div style={{ overflowX: "auto", marginBottom: 24 }}>
-        <svg width={LABEL_W + META_W + TRACK_W + 80} height={totalH} style={{ display: "block" }}>
+        <svg width={SVG_W} height={totalH} style={{ display: "block" }}>
           {/* Zero axis */}
-          <line x1={zeroX} y1={0} x2={zeroX} y2={totalH - 40} stroke="#E2E8F0" strokeWidth={1} />
+          <line x1={zeroX} y1={0} x2={zeroX} y2={totalH - 8} stroke="#E2E8F0" strokeWidth={1} />
 
-          {steps.map((step, i) => {
-            const y = i * (BAR_H + GAP) + 4;
+          {allRows.map((step, i) => {
+            const y = i * (BAR_H + GAP);
+            const isTrough = step.type === "trough";
             const isNeg = step.runningBalance < 0;
-            const barColor =
-              step.type === "start" ? "#FF3EA5" :
-              step.type === "positive" ? "#16A34A" :
-              "#DC2626";
 
-            // Position of the running balance bar (absolute from zero)
-            const bx = isNeg ? zeroX + step.runningBalance * scale : zeroX;
-            const bw = Math.abs(step.runningBalance) * scale;
-
-            // The delta arrow width (for non-start steps)
-            const prevBalance = i === 0 ? 0 : steps[i - 1].runningBalance;
-            const deltaW = Math.abs(step.value) * scale;
-            const deltaX = step.value >= 0
-              ? zeroX + Math.min(prevBalance, step.runningBalance) * scale
-              : zeroX + step.runningBalance * scale;
+            // Single balance bar — from zero to running balance
+            const bLeft = Math.min(xOf(step.runningBalance), zeroX);
+            const bRight = Math.max(xOf(step.runningBalance), zeroX);
+            const bW = bRight - bLeft;
+            const bColor = isTrough ? "#DC2626" : isNeg ? "#DC2626" : "#FF3EA5";
 
             return (
               <g key={i}>
-                {/* Label */}
+                {/* Row label */}
                 <text
-                  x={LABEL_W - 8}
-                  y={y + BAR_H / 2 + 1}
+                  x={LABEL_W - 6}
+                  y={y + BAR_H / 2 - 4}
                   textAnchor="end"
                   dominantBaseline="middle"
-                  fontSize={12}
-                  fontWeight={600}
-                  fill="#0F172A"
+                  fontSize={isTrough ? 10 : 12}
+                  fontWeight={isTrough ? 500 : 600}
+                  fill={isTrough ? "#DC2626" : "#0F172A"}
+                  fontStyle={isTrough ? "italic" : "normal"}
                 >
                   {step.label}
                 </text>
                 <text
-                  x={LABEL_W - 8}
-                  y={y + BAR_H / 2 + 13}
+                  x={LABEL_W - 6}
+                  y={y + BAR_H / 2 + 7}
                   textAnchor="end"
                   dominantBaseline="middle"
                   fontSize={9}
@@ -124,140 +135,49 @@ export function FundingBridge({ scenario }: Props) {
                   {step.sub}
                 </text>
 
-                {/* Running balance bar (cumulative) */}
-                <rect
-                  x={isNeg ? zeroX + step.runningBalance * scale : zeroX}
-                  y={y + 4}
-                  width={Math.abs(step.runningBalance) * scale}
-                  height={BAR_H - 8}
-                  fill={i === 0 ? "#FF3EA5" : isNeg ? "#DC2626" : "#FF3EA5"}
-                  opacity={0.18}
-                  rx={2}
-                />
-
-                {/* Delta bar (the change this period) */}
-                {i > 0 && (
-                  <rect
-                    x={deltaX}
-                    y={y + 2}
-                    width={deltaW}
-                    height={BAR_H - 4}
-                    fill={barColor}
-                    opacity={0.75}
-                    rx={2}
-                  />
-                )}
-
-                {/* Start bar */}
-                {i === 0 && (
-                  <rect
-                    x={zeroX}
-                    y={y + 2}
-                    width={SPENDABLE_CASH * scale}
-                    height={BAR_H - 4}
-                    fill="#FF3EA5"
-                    opacity={0.75}
-                    rx={2}
-                  />
-                )}
-
-                {/* Running balance label */}
-                <text
-                  x={isNeg ? zeroX + step.runningBalance * scale - 6 : zeroX + step.runningBalance * scale + 6}
-                  y={y + BAR_H / 2 + 1}
-                  textAnchor={isNeg ? "end" : "start"}
-                  dominantBaseline="middle"
-                  fontSize={11}
-                  fontWeight={700}
-                  fontFamily="var(--font-mono, monospace)"
-                  fill={isNeg ? "#DC2626" : "#FF3EA5"}
-                >
-                  {fmtUSD(step.runningBalance, true)}
-                </text>
-
-                {/* Delta value in left column */}
-                {i > 0 && (
+                {/* Delta column (net change) */}
+                {step.type !== "start" && !isTrough && step.value !== 0 && (
                   <text
-                    x={LABEL_W + META_W - 8}
+                    x={LABEL_W + DELTA_W - 4}
                     y={y + BAR_H / 2 + 1}
                     textAnchor="end"
                     dominantBaseline="middle"
                     fontSize={11}
                     fontWeight={600}
                     fontFamily="var(--font-mono, monospace)"
-                    fill={step.value >= 0 ? "#16A34A" : "#DC2626"}
+                    fill={step.value > 0 ? "#16A34A" : "#DC2626"}
                   >
-                    {step.value >= 0 ? "+" : ""}{fmtUSD(step.value, true)}
+                    {step.value > 0 ? "+" : ""}{fmtUSD(step.value, true)}
                   </text>
                 )}
+
+                {/* Balance column (ending balance — fixed position, no floating) */}
+                <text
+                  x={LABEL_W + DELTA_W + BAL_W - 4}
+                  y={y + BAR_H / 2 + 1}
+                  textAnchor="end"
+                  dominantBaseline="middle"
+                  fontSize={11}
+                  fontWeight={700}
+                  fontFamily="var(--font-mono, monospace)"
+                  fill={isTrough ? "#DC2626" : isNeg ? "#DC2626" : "#FF3EA5"}
+                >
+                  {fmtUSD(step.runningBalance, true)}
+                </text>
+
+                {/* Balance bar */}
+                <rect
+                  x={bLeft}
+                  y={y + (isTrough ? 6 : 4)}
+                  width={Math.max(bW, 2)}
+                  height={isTrough ? BAR_H - 12 : BAR_H - 8}
+                  fill={bColor}
+                  opacity={isTrough ? 0.35 : 0.75}
+                  rx={2}
+                />
               </g>
             );
           })}
-
-          {/* Trough annotation if negative balance */}
-          {stats.peakGap > 0 && (
-            <g>
-              <text
-                x={LABEL_W - 8}
-                y={steps.length * (BAR_H + GAP) + 16}
-                textAnchor="end"
-                fontSize={10}
-                fontWeight={700}
-                fill="#DC2626"
-              >
-                Trough
-              </text>
-              <text
-                x={LABEL_W - 8}
-                y={steps.length * (BAR_H + GAP) + 28}
-                textAnchor="end"
-                fontSize={9}
-                fill="#94A3B8"
-              >
-                {stats.troughLabel ?? "—"}
-              </text>
-              <text
-                x={LABEL_W + META_W - 8}
-                y={steps.length * (BAR_H + GAP) + 18}
-                textAnchor="end"
-                fontSize={12}
-                fontWeight={700}
-                fontFamily="var(--font-mono, monospace)"
-                fill="#DC2626"
-              >
-                {fmtUSD(stats.troughBalance, true)}
-              </text>
-              {/* Trough gap bracket */}
-              <rect
-                x={zeroX + stats.troughBalance * scale}
-                y={steps.length * (BAR_H + GAP) + 4}
-                width={-stats.troughBalance * scale}
-                height={16}
-                fill="#DC2626"
-                opacity={0.12}
-                rx={2}
-              />
-              <line
-                x1={zeroX + stats.troughBalance * scale}
-                y1={steps.length * (BAR_H + GAP) + 4}
-                x2={zeroX}
-                y2={steps.length * (BAR_H + GAP) + 4}
-                stroke="#DC2626"
-                strokeWidth={1}
-                strokeDasharray="3 2"
-              />
-              <text
-                x={zeroX + stats.troughBalance * scale / 2}
-                y={steps.length * (BAR_H + GAP) + 15}
-                textAnchor="middle"
-                fontSize={9}
-                fontWeight={600}
-                fill="#DC2626"
-              >
-                GAP: {fmtUSD(stats.peakGap, true)}
-              </text>
-            </g>
-          )}
         </svg>
       </div>
 

@@ -27,13 +27,6 @@ const SCENARIOS: { id: Scenario; label: string; sub: string; tag: string; tagCol
     tagColor: "#D97706",
   },
   {
-    id: "receipts_3w",
-    label: "Receipts −3 Wks",
-    sub: "All inflows delayed 21 days",
-    tag: "Severe",
-    tagColor: "#DC2626",
-  },
-  {
     id: "defer_costs",
     label: "Defer Costs",
     sub: "Negotiable outflows pushed 30 days",
@@ -60,7 +53,7 @@ export function ScenarioLab({ selected, onChange }: Props) {
   return (
     <div>
       {/* Scenario buttons */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 10, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginBottom: 28 }}>
         {SCENARIOS.map((s) => {
           const stats = ALL_SCENARIO_STATS[s.id];
           const isActive = selected === s.id;
@@ -69,6 +62,7 @@ export function ScenarioLab({ selected, onChange }: Props) {
               key={s.id}
               onClick={() => onChange(s.id)}
               style={{
+                gridColumn: s.id === "base" ? "1 / -1" : undefined,
                 padding: "14px 16px",
                 background: isActive ? "#FFD6EB" : "#FAFAFA",
                 border: `1.5px solid ${isActive ? "#FF3EA5" : "#E2E8F0"}`,

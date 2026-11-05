@@ -188,9 +188,9 @@ function CostBreakdownChart({ econ, color }: { econ: EventEconomics; color: stri
           formatter={(value: unknown, name: unknown) => [fmtUSD((value as number) * 1000, true), String(name).charAt(0).toUpperCase() + String(name).slice(1)]}
           contentStyle={{ fontSize: 12, border: "1px solid #E2E8F0", borderRadius: 6 }}
         />
-        <Bar dataKey="booked" name="Booked" fill="#0F172A" opacity={0.7} radius={[2, 2, 0, 0]} maxBarSize={24} />
-        <Bar dataKey="paid" name="Paid" fill={color} opacity={0.7} radius={[2, 2, 0, 0]} maxBarSize={24} />
-        <Bar dataKey="remaining" name="Remaining" fill="#D97706" opacity={0.6} radius={[2, 2, 0, 0]} maxBarSize={24} />
+        <Bar dataKey="booked" name="Booked" fill="#64748B" opacity={0.8} radius={[2, 2, 0, 0]} maxBarSize={24} />
+        <Bar dataKey="paid" name="Paid" fill="#FF3EA5" opacity={0.75} radius={[2, 2, 0, 0]} maxBarSize={24} />
+        <Bar dataKey="remaining" name="Remaining" fill="#D97706" opacity={0.65} radius={[2, 2, 0, 0]} maxBarSize={24} />
       </BarChart>
     </ResponsiveContainer>
   );
